@@ -21,7 +21,8 @@ import sys
 import ns.core
 import ns.csma
 import ns.applications
-import ns.internet	
+import ns.internet
+import ns.animation
 
 if __name__ == '__main__':
 
@@ -81,7 +82,7 @@ if __name__ == '__main__':
     csma.EnablePcapAll("udp-echo-py", False)
     
     print "Run Simulation."
-    anim = AnimationInterface("animation.xml")
+    anim = ns.animation.AnimationInterface("animation.xml")
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
     print "Done."

@@ -72,7 +72,7 @@ if __name__ == '__main__':
     apps.Stop(ns.core.Seconds(10.0))
     
     client.SetFill (apps.Get (0), "Hello World")
-	client.SetFill (apps.Get (0), 0xa5, 1024)
+    client.SetFill (apps.Get (0), 0xa5, 1024)
     
     asciitracer = ns.network.AsciiTraceHelper()
     csma.EnableAsciiAll(asciitracer.CreateFileStream("udp-echo-py.tr"))

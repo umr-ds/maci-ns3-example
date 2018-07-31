@@ -1,3 +1,6 @@
+### ENV int bandwidth "BW"
+### ENV int delay "Delay"
+
 # Network topology
 # 
 #       n0    n1   n2   n3
@@ -37,8 +40,8 @@ if __name__ == '__main__':
     
     print "Create channels."
     csma = ns.csma.CsmaHelper()
-    csma.SetChannelAttribute("DataRate", ns.core.StringValue("5000000"))
-    csma.SetChannelAttribute("Delay", ns.core.TimeValue(ns.core.MilliSeconds(2)))
+    csma.SetChannelAttribute("DataRate", ns.core.StringValue({{bandwidth}}))
+    csma.SetChannelAttribute("Delay", ns.core.TimeValue(ns.core.MilliSeconds({{delay}})))
     csma.SetDeviceAttribute("Mtu", ns.core.UintegerValue(1400))
     d = csma.Install(n)
     

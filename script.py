@@ -1,4 +1,4 @@
-### ENV string bandwidth "BW"
+### ENV int bandwidth "BW"
 ### ENV int delay "Delay"
 
 # Network topology

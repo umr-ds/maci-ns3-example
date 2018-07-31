@@ -12,6 +12,7 @@
 # - DropTail queues 
 # - Tracing of queues and packet receptions to file "udp-echo-py.tr"
 
+import framework
 import sys
 
 import ns.core

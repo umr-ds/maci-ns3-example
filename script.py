@@ -41,7 +41,7 @@ if __name__ == '__main__':
     
     print "Create channels."
     csma = ns.csma.CsmaHelper()
-    csma.SetChannelAttribute("DataRate", ns.core.StringValue({{bandwidth}}))
+    csma.SetChannelAttribute("DataRate", ns.core.StringValue(str(framework.param('bandwidth'))))
     csma.SetChannelAttribute("Delay", ns.core.TimeValue(ns.core.MilliSeconds({{delay}})))
     csma.SetDeviceAttribute("Mtu", ns.core.UintegerValue(1400))
     d = csma.Install(n)

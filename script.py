@@ -81,6 +81,7 @@ if __name__ == '__main__':
     csma.EnablePcapAll("udp-echo-py", False)
     
     print "Run Simulation."
+    anim = AnimationInterface("animation.xml")
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
     print "Done."

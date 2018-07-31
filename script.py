@@ -52,8 +52,8 @@ if __name__ == '__main__':
     serverAddress = ns.network.Address(i.GetAddress(1))
     
     print "Create Applications."
-    port = 9  # well-known echo port number
-	server = ns.applications.UdpEchoServerHelper(port)
+    port = 9
+    server = ns.applications.UdpEchoServerHelper(port)
     serverapps = server.Install(n.Get(1))
     serverapps.Start(ns.core.Seconds(1.0))
     serverapps.Stop(ns.core.Seconds(10.0))

@@ -22,7 +22,7 @@ import ns.core
 import ns.csma
 import ns.applications
 import ns.internet
-import ns.animation
+import ns.netanim
 
 if __name__ == '__main__':
 

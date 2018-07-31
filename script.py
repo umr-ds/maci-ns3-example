@@ -1,5 +1,8 @@
 ### ENV int bandwidth "BW"
 ### ENV int delay "Delay"
+### ENV int packetSize "Packet Size"
+### ENV int maxPacketCount "Count"
+### ENV float interval "Interval"
 
 # Network topology
 # 
@@ -24,8 +27,8 @@ if __name__ == '__main__':
 
     framework.start()
     
-    ns.core.LogComponentEnable("UdpEchoClientApplication", ns.core.LOG_LEVEL_ALL)
-    ns.core.LogComponentEnable("UdpEchoServerApplication", ns.core.LOG_LEVEL_ALL)
+    #ns.core.LogComponentEnable("UdpEchoClientApplication", ns.core.LOG_LEVEL_ALL)
+    #ns.core.LogComponentEnable("UdpEchoServerApplication", ns.core.LOG_LEVEL_ALL)
     
     cmd = ns.core.CommandLine()
     cmd.useIpv6 = "False"
@@ -59,14 +62,12 @@ if __name__ == '__main__':
     serverapps.Start(ns.core.Seconds(1.0))
     serverapps.Stop(ns.core.Seconds(10.0))
     
-    packetSize = 1024
-    maxPacketCount = 1
-    interPacketInterval = ns.core.Seconds(1.0)
+    interPacketInterval = ns.core.Seconds({{interval}})
     
     client = ns.applications.UdpEchoClientHelper(serverAddress, port)
-    client.SetAttribute("MaxPackets", ns.core.UintegerValue(maxPacketCount))
+    client.SetAttribute("MaxPackets", ns.core.UintegerValue({{maxPacketCount}}))
     client.SetAttribute("Interval", ns.core.TimeValue(interPacketInterval))
-    client.SetAttribute("PacketSize", ns.core.UintegerValue(packetSize))
+    client.SetAttribute("PacketSize", ns.core.UintegerValue({{packetSize}}))
     
     apps = client.Install(n.Get(0))
     apps.Start(ns.core.Seconds(2.0))

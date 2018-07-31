@@ -1,1 +1,1 @@
-{"paramValues":{"bandwidth":[],"delay":[2,5]},"capabilities":["ns3"],"repetitions":1,"seeds":1}
+{"paramValues":{"bandwidth":["500000"],"delay":[2,5]},"capabilities":["ns3"],"repetitions":1,"seeds":1}

@@ -1,6 +1,6 @@
 ### ENV float dist "Distance in meters"
 ### ENV float freq "Wi-Fi frequency"
-### ENV int mcs "MCS" aka. DataRate
+### ENV int mcs "MCS aka. DataRate"
 ### ENV int ch_width "Channel width"
 ### ENV int gi "GI"
 

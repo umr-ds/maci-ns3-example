@@ -1,115 +1,154 @@
-### ENV int mean_bw "The mean bandwidth at the bottleneck"
-### ENV int delay "The delay per link"
+### ENV float dist "Distance in meters"
+### ENV float freq "Wi-Fi frequency"
+### ENV int mcs "MCS" aka. DataRate
+### ENV int ch_width "Channel width"
+### ENV int gi "GI"
+
+import framework
 
 import ns.core
 import ns.network
-import ns.csma
+import ns.applications
+import ns.wifi
+import ns.mobility
 import ns.internet
-import framework
+
+# This is a simple example in order to show how to configure an IEEE 802.11n Wi-Fi network.
+#
+# It ouputs the UDP goodput for every VHT bitrate value, which depends on the MCS value (0 to 7), the
+# channel width (20 or 40 MHz) and the guard interval (long or short). The PHY bitrate is constant over all
+# the simulation run. The user can also specify the distance between the access point and the station: the
+# larger the distance the smaller the goodput.
+#
+# The simulation assumes a single station in an infrastructure network:
+#
+#  STA     AP
+#    *     *
+#    |     |
+#   n1     n2
+#
+# Packets in this simulation aren't marked with a QosTag so they are considered
+# belonging to BestEffort Access Class (AC_BE).
 
 def main(argv):
-
     framework.start()
 
-    cmd = ns.core.CommandLine()
-    cmd.Parse (argv)
+    cmd = ns.core.CommandLine ()
+    cmd.udp = "True"
+    cmd.simulationTime = 10 #seconds
+    cmd.distance = {{dist}}
+    cmd.frequency = {{freq}}
 
-    # Configuration.
+    cmd.AddValue ("frequency", "Whether working in the 2.4 or 5.0 GHz band (other values gets rejected)")
+    cmd.AddValue ("distance", "Distance in meters between the station and the access point")
+    cmd.AddValue ("simulationTime", "Simulation time in seconds")
+    cmd.AddValue ("udp", "UDP if set to True, TCP otherwise")
+    cmd.Parse (sys.argv)
 
-    # Build nodes
-    term_0 = ns.network.NodeContainer()
-    term_0.Create (1)
-    term_1 = ns.network.NodeContainer()
-    term_1.Create (1)
-    bridge_0 = ns.network.NodeContainer()
-    bridge_0.Create (1)
-    bridge_1 = ns.network.NodeContainer()
-    bridge_1.Create (1)
+    udp = cmd.udp
+    simulationTime = float(cmd.simulationTime)
+    distance = float(cmd.distance)
+    frequency = float(cmd.frequency)
 
-    # Build link.
-    csma_bridge_0 = ns.csma.CsmaHelper();
-    csma_bridge_0.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
-    csma_bridge_0.SetChannelAttribute("Delay",  ns.core.TimeValue (ns.core.MilliSeconds({{delay}})))
-    csma_bridge_1 = ns.csma.CsmaHelper();
-    csma_bridge_1.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
-    csma_bridge_1.SetChannelAttribute("Delay",  ns.core.TimeValue (ns.core.MilliSeconds({{delay}})))
-    csma_hub_0 = ns.csma.CsmaHelper()
-    csma_hub_0.SetChannelAttribute("DataRate", ns.network.DataRateValue(ns.network.DataRate({{mean_bw}})))
-    csma_hub_0.SetChannelAttribute("Delay",  ns.core.TimeValue(ns.core.MilliSeconds({{delay}})))
+    payloadSize = 1472
 
-    # Build link net device container.
-    all_bridge_0 = ns.network.NodeContainer()
-    all_bridge_0.Add (term_0)
-    terminalDevices_bridge_0 = ns.network.NetDeviceContainer()
-    BridgeDevices_bridge_0 = ns.network.NetDeviceContainer()
-    for i in range(1):
-        link = csma_bridge_0.Install(ns.network.NodeContainer(all_bridge_0.Get(i), bridge_0))
-        terminalDevices_bridge_0.Add(link.Get(0))
-        BridgeDevices_bridge_0.Add(link.Get(1))
-    bridge_bridge_0 = ns.network.BridgeHelper
-    bridge_bridge_0.Install(bridge_0.Get(0), BridgeDevices_bridge_0)
-    ndc_bridge_0 = terminalDevices_bridge_0
-    all_bridge_1 = ns.network.NodeContainer()
-    all_bridge_1.Add (term_1)
-    terminalDevices_bridge_1 = ns.network.NetDeviceContainer()
-    BridgeDevices_bridge_1 = ns.network.NetDeviceContainer()
-    for i in range(1):
-        link = csma_bridge_1.Install(ns.network.NodeContainer(all_bridge_1.Get(i), bridge_1))
-        terminalDevices_bridge_1.Add(link.Get(0))
-        BridgeDevices_bridge_1.Add(link.Get(1))
-    bridge_bridge_1 = ns.network.BridgeHelper
-    bridge_bridge_1.Install(bridge_1.Get(0), BridgeDevices_bridge_1)
-    ndc_bridge_1 = terminalDevices_bridge_1
-    all_hub_0 = ns.network.NodeContainer()
-    all_hub_0.Add (bridge_0)
-    all_hub_0.Add (bridge_1)
-    ndc_hub_0 = csma_hub_0.Install(all_hub_0)
+    print "MCS value" , "\t\t", "Channel width", "\t\t", "short GI","\t\t","Throughput" ,'\n'
 
-    # Install the IP stack.
-    internetStackH = ns.internet.InternetStackHelper()
-    internetStackH.Install (term_0)
-    internetStackH.Install (term_1)
+    wifiStaNode = ns.network.NodeContainer ()
+    wifiStaNode.Create (1)
+    wifiApNode = ns.network.NodeContainer ()
+    wifiApNode.Create (1)
 
-    # IP assign.
-    ipv4 = ns.internet.Ipv4AddressHelper()
-    ipv4.SetBase (ns.network.Ipv4Address("10.0.0.0"), ns.network.Ipv4Mask("255.255.255.0"))
-    iface_ndc_bridge_0 = ipv4.Assign (ndc_bridge_0)
-    ipv4.SetBase (ns.network.Ipv4Address("10.0.1.0"), ns.network.Ipv4Mask("255.255.255.0"))
-    iface_ndc_bridge_1 = ipv4.Assign (ndc_bridge_1)
-    ipv4.SetBase (ns.network.Ipv4Address("10.0.2.0"), ns.network.Ipv4Mask("255.255.255.0"))
-    iface_ndc_hub_0 = ipv4.Assign (ndc_hub_0)
+    channel = ns.wifi.YansWifiChannelHelper.Default ()
+    phy = ns.wifi.YansWifiPhyHelper.Default ()
+    phy.SetChannel (channel.Create ())
 
-    # Generate Route.
-    ns.network.Ipv4GlobalRoutingHelper.PopulateRoutingTables ()
+    # Set guard interval
+    phy.Set ("ShortGuardEnabled", ns.core.BooleanValue ({{gi}}))
+    wifi = ns.wifi.WifiHelper.Default ()
+    if frequency == 5.0:
+        wifi.SetStandard (ns.wifi.WIFI_PHY_STANDARD_80211n_5GHZ)
 
-    # Generate Application.
-    port_tcp_0 = 5500
-    sinkLocalAddress_tcp_0 = ns.network.Address(ns.network.InetSocketAddress(ns.network.Ipv4Address.GetAny(), port_tcp_0))
-    sinkHelper_tcp_0 = ns.network.PacketSinkHelper("ns3::TcpSocketFactory", sinkLocalAddress_tcp_0)
-    sinkApp_tcp_0 = sinkHelper_tcp_0.Install(term_1)
-    sinkApp_tcp_0.Start(ns.core.Seconds(1.0))
-    sinkApp_tcp_0.Stop(ns.core.Seconds(10.0))
-    clientHelper_tcp_0 = ns.network.OnOffHelper("ns3::TcpSocketFactory", ns.network.Address())
-    clientHelper_tcp_0.SetAttribute("OnTime", ns.core.StringValue ("ns3::ConstantRandomVariable[Constant=1]"))
-    clientHelper_tcp_0.SetAttribute("OffTime", ns.core.StringValue ("ns3::ConstantRandomVariable[Constant=0]"))
-    clientApps_tcp_0 = ns.network.ApplicationContainer()
-    remoteAddress_tcp_0 = ns.network.AddressValue(ns.network.InetSocketAddress(iface_ndc_bridge_1.GetAddress(0), port_tcp_0))
-    clientHelper_tcp_0.SetAttribute("Remote", remoteAddress_tcp_0)
-    clientApps_tcp_0.Add(clientHelper_tcp_0.Install(term_0))
-    clientApps_tcp_0.Start(ns.core.Seconds(1.0))
-    clientApps_tcp_0.Stop(ns.core.Seconds(10.0))
+    elif frequency == 2.4:
+        wifi.SetStandard (ns.wifi.WIFI_PHY_STANDARD_80211n_2_4GHZ)
+        ns.core.Config.SetDefault ("ns3::LogDistancePropagationLossModel::ReferenceLoss", ns.core.DoubleValue (40.046))
 
-    # Simulation.
-    # Pcap output.
-    # Stop the simulation after x seconds.
-    stopTime = 11
-    ns.core.Simulator.Stop (ns.core.Seconds(stopTime))
-    # Start and clean simulation.
-    ns.core.Simulator.Run()
-    ns.core.Simulator.Destroy()
+    mac = ns.wifi.HtWifiMacHelper.Default ()
+    DataRate = ns.wifi.HtWifiMacHelper.DataRateForMcs ({{mcs}})
+    wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
+                                "ControlMode", DataRate)
+
+    ssid = ns.wifi.Ssid ("ns3-80211n")
+
+    mac.SetType ("ns3::StaWifiMac",
+                "Ssid", ns.wifi.SsidValue (ssid),
+                "ActiveProbing", ns.core.BooleanValue (False))
+
+    staDevice = wifi.Install (phy, mac, wifiStaNode)
+    mac.SetType ("ns3::ApWifiMac",
+                "Ssid", ns.wifi.SsidValue (ssid))
+
+    apDevice = wifi.Install (phy, mac, wifiApNode)
+
+    # Set channel width
+    ns.core.Config.Set ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/ChannelWidth", ns.core.UintegerValue ({{ch_width}}))
+
+    # mobility
+    mobility = ns.mobility.MobilityHelper ()
+    positionAlloc = ns.mobility.ListPositionAllocator ()
+
+    positionAlloc.Add (ns.core.Vector3D (0.0, 0.0, 0.0))
+    positionAlloc.Add (ns.core.Vector3D (distance, 0.0, 0.0))
+    mobility.SetPositionAllocator (positionAlloc)
+
+    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel")
+
+    mobility.Install (wifiApNode)
+    mobility.Install (wifiStaNode)
+
+    # Internet stack
+    stack = ns.internet.InternetStackHelper ()
+    stack.Install (wifiApNode)
+    stack.Install (wifiStaNode)
+
+    address = ns.internet.Ipv4AddressHelper ()
+
+    address.SetBase (ns.network.Ipv4Address ("192.168.1.0"), ns.network.Ipv4Mask ("255.255.255.0"))
+    staNodeInterface = address.Assign (staDevice)
+    apNodeInterface = address.Assign (apDevice)
+
+    # Setting applications
+    serverApp = ns.network.ApplicationContainer ()
+    sinkApp = ns.network.ApplicationContainer ()
+
+    # UDP flow
+    myServer=ns.applications.UdpServerHelper (9)
+    serverApp = myServer.Install (ns.network.NodeContainer (wifiStaNode.Get (0)))
+    serverApp.Start (ns.core.Seconds (0.0))
+    serverApp.Stop (ns.core.Seconds (simulationTime + 1))
+
+    myClient = ns.applications.UdpClientHelper (staNodeInterface.GetAddress (0), 9)
+    myClient.SetAttribute ("MaxPackets", ns.core.UintegerValue (4294967295))
+    myClient.SetAttribute ("Interval", ns.core.TimeValue (ns.core.Time ("0.00001"))) # packets/s
+    myClient.SetAttribute ("PacketSize", ns.core.UintegerValue (payloadSize))
+
+    clientApp = myClient.Install (ns.network.NodeContainer (wifiApNode.Get (0)))
+    clientApp.Start (ns.core.Seconds (1.0))
+    clientApp.Stop (ns.core.Seconds (simulationTime + 1))
+
+    ns.internet.Ipv4GlobalRoutingHelper.PopulateRoutingTables ()
+
+    ns.core.Simulator.Stop (ns.core.Seconds (simulationTime + 1))
+    ns.core.Simulator.Run ()
+    ns.core.Simulator.Destroy ()
+
+    totalPacketsThrough = serverApp.Get (0).GetReceived ()
+    throughput = totalPacketsThrough * payloadSize * 8 / (simulationTime * 1000000.0) # Mbit/s
+
+    print i, "\t\t\t", {{ch_width}} , " MHz\t\t\t", k , "\t\t\t" , throughput , " Mbit/s"
 
     framework.stop()
 
 if __name__ == '__main__':
     import sys
-    main(sys.argv)
+    sys.exit (main (sys.argv))

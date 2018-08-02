@@ -28,13 +28,13 @@ def main(argv):
     # Build link.
     csma_bridge_0 = ns.csma.CsmaHelper();
     csma_bridge_0.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
-    csma_bridge_0.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
+    csma_bridge_0.SetChannelAttribute("Delay",  ns.network.TimeValue (ns.network.MilliSeconds({{delay}})))
     csma_bridge_1 = ns.csma.CsmaHelper();
-    csma_bridge_1.SetChannelAttribute("DataRate", ns3.DataRateValue (ns3.DataRate(100000000)))
-    csma_bridge_1.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
+    csma_bridge_1.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
+    csma_bridge_1.SetChannelAttribute("Delay",  ns.network.TimeValue (ns.network.MilliSeconds({{delay}})))
     csma_hub_0 = ns.csma.CsmaHelper()
-    csma_hub_0.SetChannelAttribute("DataRate", ns3.DataRateValue(ns3.DataRate({{mean_bw}})))
-    csma_hub_0.SetChannelAttribute("Delay",  ns3.TimeValue(ns3.MilliSeconds({{delay}})))
+    csma_hub_0.SetChannelAttribute("DataRate", ns.network.DataRateValue(ns.network.DataRate({{mean_bw}})))
+    csma_hub_0.SetChannelAttribute("Delay",  ns.network.TimeValue(ns.network.MilliSeconds({{delay}})))
 
     # Build link net device container.
     all_bridge_0 = ns3.NodeContainer()

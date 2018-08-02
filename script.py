@@ -1,3 +1,6 @@
+### ENV int mean_bw "The mean bandwidth at the bottleneck"
+### ENV int delay "The delay per link"
+
 import ns3
 import framework
 
@@ -23,13 +26,13 @@ def main(argv):
     # Build link.
     csma_bridge_0 = ns3.CsmaHelper();
     csma_bridge_0.SetChannelAttribute("DataRate", ns3.DataRateValue (ns3.DataRate(100000000)))
-    csma_bridge_0.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds(10000)))
+    csma_bridge_0.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
     csma_bridge_1 = ns3.CsmaHelper();
     csma_bridge_1.SetChannelAttribute("DataRate", ns3.DataRateValue (ns3.DataRate(100000000)))
-    csma_bridge_1.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds(10000)))
+    csma_bridge_1.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
     csma_hub_0 = ns3.CsmaHelper()
-    csma_hub_0.SetChannelAttribute("DataRate", ns3.DataRateValue(ns3.DataRate(100000000)))
-    csma_hub_0.SetChannelAttribute("Delay",  ns3.TimeValue(ns3.MilliSeconds(10000)))
+    csma_hub_0.SetChannelAttribute("DataRate", ns3.DataRateValue(ns3.DataRate({{mean_bw}})))
+    csma_hub_0.SetChannelAttribute("Delay",  ns3.TimeValue(ns3.MilliSeconds({{delay}})))
 
     # Build link net device container.
     all_bridge_0 = ns3.NodeContainer()

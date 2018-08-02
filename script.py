@@ -1,14 +1,15 @@
 ### ENV int mean_bw "The mean bandwidth at the bottleneck"
 ### ENV int delay "The delay per link"
 
-import ns.core as ns3
+import ns.core
+import ns.network as ns3
 import framework
 
 def main(argv):
 
     framework.start()
 
-    cmd = ns3.CommandLine()
+    cmd = ns.core.CommandLine()
     cmd.Parse (argv)
 
     # Configuration.

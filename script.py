@@ -43,7 +43,7 @@ def main(argv):
     terminalDevices_bridge_0 = ns.network.NetDeviceContainer()
     BridgeDevices_bridge_0 = ns.network.NetDeviceContainer()
     for i in range(1):
-        link = csma_bridge_0.Install(NodeContainer(all_bridge_0.Get(i), bridge_0))
+        link = csma_bridge_0.Install(ns.network.NodeContainer(all_bridge_0.Get(i), bridge_0))
         terminalDevices_bridge_0.Add(link.Get(0))
         BridgeDevices_bridge_0.Add(link.Get(1))
     bridge_bridge_0 = ns.network.BridgeHelper
@@ -54,7 +54,7 @@ def main(argv):
     terminalDevices_bridge_1 = ns.network.NetDeviceContainer()
     BridgeDevices_bridge_1 = ns.network.NetDeviceContainer()
     for i in range(1):
-        link = csma_bridge_1.Install(NodeContainer(all_bridge_1.Get(i), bridge_1))
+        link = csma_bridge_1.Install(ns.network.NodeContainer(all_bridge_1.Get(i), bridge_1))
         terminalDevices_bridge_1.Add(link.Get(0))
         BridgeDevices_bridge_1.Add(link.Get(1))
     bridge_bridge_1 = ns.network.BridgeHelper

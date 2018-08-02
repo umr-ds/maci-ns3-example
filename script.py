@@ -26,13 +26,13 @@ def main(argv):
     bridge_1.Create (1)
 
     # Build link.
-    csma_bridge_0 = ns3.CsmaHelper();
-    csma_bridge_0.SetChannelAttribute("DataRate", ns3.DataRateValue (ns3.DataRate(100000000)))
+    csma_bridge_0 = ns.csma.CsmaHelper();
+    csma_bridge_0.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns3.DataRate(100000000)))
     csma_bridge_0.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
-    csma_bridge_1 = ns3.CsmaHelper();
+    csma_bridge_1 = ns.csma.CsmaHelper();
     csma_bridge_1.SetChannelAttribute("DataRate", ns3.DataRateValue (ns3.DataRate(100000000)))
     csma_bridge_1.SetChannelAttribute("Delay",  ns3.TimeValue (ns3.MilliSeconds({{delay}})))
-    csma_hub_0 = ns3.CsmaHelper()
+    csma_hub_0 = ns.csma.CsmaHelper()
     csma_hub_0.SetChannelAttribute("DataRate", ns3.DataRateValue(ns3.DataRate({{mean_bw}})))
     csma_hub_0.SetChannelAttribute("Delay",  ns3.TimeValue(ns3.MilliSeconds({{delay}})))
 

@@ -74,7 +74,7 @@ def main(argv):
         ns.core.Config.SetDefault ("ns3::LogDistancePropagationLossModel::ReferenceLoss", ns.core.DoubleValue (40.046))
 
     mac = ns.wifi.WifiMacHelper()
-    DataRate = ns.wifi.HtWifiMacHelper.DataRateForMcs ({{mcs}})
+    DataRate = ns.wifi.WifiMacHelper.DataRateForMcs ({{mcs}})
     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
                                 "ControlMode", DataRate)
 

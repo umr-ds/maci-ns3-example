@@ -73,7 +73,7 @@ def main(argv):
         wifi.SetStandard (ns.wifi.WIFI_PHY_STANDARD_80211n_2_4GHZ)
         ns.core.Config.SetDefault ("ns3::LogDistancePropagationLossModel::ReferenceLoss", ns.core.DoubleValue (40.046))
 
-    mac = ns.wifi.HtWifiMacHelper()
+    mac = ns.wifi.WifiMacHelper()
     DataRate = ns.wifi.HtWifiMacHelper.DataRateForMcs ({{mcs}})
     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate,
                                 "ControlMode", DataRate)

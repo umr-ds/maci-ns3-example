@@ -1,7 +1,7 @@
 ### ENV int mean_bw "The mean bandwidth at the bottleneck"
 ### ENV int delay "The delay per link"
 
-import ns3
+import ns as ns3
 import framework
 
 def main(argv):

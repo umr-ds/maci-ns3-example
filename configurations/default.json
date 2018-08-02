@@ -1,1 +1,1 @@
-{"paramValues":{"bandwidth":["500000",5000000],"delay":[10,12,14,16,18,20],"packetSize":[1200,64],"maxPacketCount":[1000],"interval":[1,0.5,0.1],"mean_bw":[]},"capabilities":["ns3"],"repetitions":"5","seeds":1}
+{"paramValues":{"delay":[10,12,14,16,18,20],"mean_bw":[100000000,1000000000,1000000]},"capabilities":["ns3"],"repetitions":"5","seeds":1}

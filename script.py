@@ -2,7 +2,8 @@
 ### ENV int delay "The delay per link"
 
 import ns.core
-import ns.network as ns3
+import ns.network
+import ns.csma as ns3
 import framework
 
 def main(argv):
@@ -15,13 +16,13 @@ def main(argv):
     # Configuration.
 
     # Build nodes
-    term_0 = ns3.NodeContainer()
+    term_0 = ns.network.NodeContainer()
     term_0.Create (1)
-    term_1 = ns3.NodeContainer()
+    term_1 = ns.network.NodeContainer()
     term_1.Create (1)
-    bridge_0 = ns3.NodeContainer()
+    bridge_0 = ns.network.NodeContainer()
     bridge_0.Create (1)
-    bridge_1 = ns3.NodeContainer()
+    bridge_1 = ns.network.NodeContainer()
     bridge_1.Create (1)
 
     # Build link.

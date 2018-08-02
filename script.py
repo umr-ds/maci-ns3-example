@@ -3,7 +3,7 @@
 
 import ns.core
 import ns.network
-import ns.csma as ns3
+import ns.csma
 import framework
 
 def main(argv):
@@ -28,16 +28,16 @@ def main(argv):
     # Build link.
     csma_bridge_0 = ns.csma.CsmaHelper();
     csma_bridge_0.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
-    csma_bridge_0.SetChannelAttribute("Delay",  ns.network.TimeValue (ns.network.MilliSeconds({{delay}})))
+    csma_bridge_0.SetChannelAttribute("Delay",  ns.core.TimeValue (ns.core.MilliSeconds({{delay}})))
     csma_bridge_1 = ns.csma.CsmaHelper();
     csma_bridge_1.SetChannelAttribute("DataRate", ns.network.DataRateValue (ns.network.DataRate(100000000)))
-    csma_bridge_1.SetChannelAttribute("Delay",  ns.network.TimeValue (ns.network.MilliSeconds({{delay}})))
+    csma_bridge_1.SetChannelAttribute("Delay",  ns.core.TimeValue (ns.core.MilliSeconds({{delay}})))
     csma_hub_0 = ns.csma.CsmaHelper()
     csma_hub_0.SetChannelAttribute("DataRate", ns.network.DataRateValue(ns.network.DataRate({{mean_bw}})))
-    csma_hub_0.SetChannelAttribute("Delay",  ns.network.TimeValue(ns.network.MilliSeconds({{delay}})))
+    csma_hub_0.SetChannelAttribute("Delay",  ns.core.TimeValue(ns.core.MilliSeconds({{delay}})))
 
     # Build link net device container.
-    all_bridge_0 = ns3.NodeContainer()
+    all_bridge_0 = ns.network.NodeContainer()
     all_bridge_0.Add (term_0)
     terminalDevices_bridge_0 = ns3.NetDeviceContainer()
     BridgeDevices_bridge_0 = ns3.NetDeviceContainer()
@@ -48,7 +48,7 @@ def main(argv):
     bridge_bridge_0 = ns3.BridgeHelper
     bridge_bridge_0.Install(bridge_0.Get(0), BridgeDevices_bridge_0)
     ndc_bridge_0 = terminalDevices_bridge_0
-    all_bridge_1 = ns3.NodeContainer()
+    all_bridge_1 = ns.network.NodeContainer()
     all_bridge_1.Add (term_1)
     terminalDevices_bridge_1 = ns3.NetDeviceContainer()
     BridgeDevices_bridge_1 = ns3.NetDeviceContainer()
@@ -59,7 +59,7 @@ def main(argv):
     bridge_bridge_1 = ns3.BridgeHelper
     bridge_bridge_1.Install(bridge_1.Get(0), BridgeDevices_bridge_1)
     ndc_bridge_1 = terminalDevices_bridge_1
-    all_hub_0 = ns3.NodeContainer()
+    all_hub_0 = ns.network.NodeContainer()
     all_hub_0.Add (bridge_0)
     all_hub_0.Add (bridge_1)
     ndc_hub_0 = csma_hub_0.Install(all_hub_0)

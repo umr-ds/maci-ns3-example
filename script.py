@@ -1,6 +1,6 @@
 import sys
 
-import framwork
+import framework
 
 import ns.applications
 import ns.core
@@ -93,7 +93,7 @@ def main(argv):
 
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
-    
+
     framework.stop()
 
 

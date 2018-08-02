@@ -65,7 +65,7 @@ def main(argv):
 
     # Set guard interval
     phy.Set ("ShortGuardEnabled", ns.core.BooleanValue ({{gi}}))
-    wifi = ns.wifi.WifiHelper.Default ()
+    wifi = ns.wifi.WifiHelper()
     if frequency == 5.0:
         wifi.SetStandard (ns.wifi.WIFI_PHY_STANDARD_80211n_5GHZ)
 

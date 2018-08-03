@@ -1,1 +1,1 @@
-{"paramValues":{"delay":[10,12,14,16,18,20],"mean_bw":[100000000,1000000000,1000000],"dist":[1,5,25],"freq":[2.4,5],"ch_width":[20,40],"gi":[0,1],"mcs":[0,1,2,3,4,5,6,7]},"capabilities":["ns3"],"repetitions":"1","seeds":1}
+{"paramValues":{},"capabilities":["ns3"],"repetitions":"1","seeds":1}

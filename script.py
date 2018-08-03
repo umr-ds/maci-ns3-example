@@ -55,7 +55,7 @@ def main():
     mac.SetType("ns3::AdhocWifiMac")
     wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager",
                                   "DataMode",
-                                  ns.core.StringValue("OfdmRate%Mbps" % {{ofdm_rate}})
+                                  ns.core.StringValue("OfdmRate{}Mbps".format({{ofdm_rate}}))
                                   )
     wifiPhy = ns.wifi.YansWifiPhyHelper.Default()
     wifiChannel = ns.wifi.YansWifiChannelHelper.Default()

@@ -247,6 +247,8 @@ def main():
     wifiPhy.EnablePcap("mixed-wireless", backboneDevices)
     wifiPhy.EnablePcap("mixed-wireless", appSink.GetId(), 0)
 
+    framework.addLogfile("mixed-wireless.tr")
+
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
     #                                                                        # 

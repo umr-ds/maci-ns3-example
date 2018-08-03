@@ -243,6 +243,10 @@ def main():
     csma.EnableAsciiAll(stream);
     internet.EnableAsciiIpv4All(stream);
 
+    mob = ascii.CreateFileStream("mixed-wireless.mob")
+    mobility.EnableAsciiAll(mob)
+
+
     #  Csma captures in non-promiscuous mode
     csma.EnablePcapAll("mixed-wireless", False)
     #  Let's do a pcap trace on the backbone devices

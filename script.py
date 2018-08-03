@@ -1,4 +1,10 @@
-### CONF int backbone_nodes "Number of backbone nodes"
+### CFG int backbone_nodes "Number of backbone nodes"
+### CFG int infra_nodes "Number of infrastructure nodes"
+### CFG int lan_nodes "Number of LAN nodes"
+### CFG int exec_time "Simulation time in seconds"
+### CFG string ofdm_rate "OFDM Data Rate (e.g.OfdmRate54Mbps)"
+### CFG int datarate "Datarate for LAN"
+### CFG int delay "Delay for LAN"
 
 import framework
 
@@ -11,97 +17,66 @@ import ns.network
 import ns.olsr
 import ns.wifi
 
-def main(argv): 
-    # 
-    #  First, we initialize a few local variables that control some 
-    #  simulation parameters.
-    #
+def main():
+    framework.start()
 
+    # First, we initialize a few local variables that control some 
+    #  simulation parameters.
     cmd = ns.core.CommandLine()
     cmd.backboneNodes = {{backbone_nodes}}
-    cmd.infraNodes = 2
-    cmd.lanNodes = 2
-    cmd.stopTime = 20
+    cmd.infraNodes = {{infra_nodes}}
+    cmd.lanNodes = {{lan_nodes}}
+    cmd.stopTime = {{exec_time}}
 
-    # 
     #  Simulation defaults are typically set next, before command line
     #  arguments are parsed.
-    # 
     ns.core.Config.SetDefault("ns3::OnOffApplication::PacketSize", ns.core.StringValue("1472"))
     ns.core.Config.SetDefault("ns3::OnOffApplication::DataRate", ns.core.StringValue("100kb/s"))
-
-    # 
-    #  For convenience, we add the local variables to the command line argument
-    #  system so that they can be overridden with flags such as 
-    #  "--backboneNodes=20"
-    # 
-    
-    cmd.AddValue("backboneNodes", "number of backbone nodes")
-    cmd.AddValue("infraNodes", "number of leaf nodes")
-    cmd.AddValue("lanNodes", "number of LAN nodes")
-    cmd.AddValue("stopTime", "simulation stop time(seconds)")
-    
-    # 
-    #  The system global variables and the local values added to the argument
-    #  system can be overridden by command line arguments by using this call.
-    # 
-    cmd.Parse(argv)
 
     backboneNodes = int(cmd.backboneNodes)
     infraNodes = int(cmd.infraNodes) 
     lanNodes = int(cmd.lanNodes)
     stopTime = int(cmd.stopTime)
 
-    if (stopTime < 10):
-        print ("Use a simulation stop time >= 10 seconds")
-        exit(1)
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
     #                                                                        # 
     #  Construct the backbone                                                # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
-
-    # 
     #  Create a container to manage the nodes of the adhoc(backbone) network.
     #  Later we'll create the rest of the nodes we'll need.
-    # 
     backbone = ns.network.NodeContainer()
     backbone.Create(backboneNodes)
-    # 
+
     #  Create the backbone wifi net devices and install them into the nodes in 
     #  our container
-    # 
     wifi = ns.wifi.WifiHelper()
     mac = ns.wifi.WifiMacHelper()
     mac.SetType("ns3::AdhocWifiMac")
     wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager",
-                                  "DataMode", ns.core.StringValue("OfdmRate54Mbps"))
+                                  "DataMode",
+                                  ns.core.StringValue(str({{ofdm_rate}}))
+                                  )
     wifiPhy = ns.wifi.YansWifiPhyHelper.Default()
     wifiChannel = ns.wifi.YansWifiChannelHelper.Default()
     wifiPhy.SetChannel(wifiChannel.Create())
     backboneDevices = wifi.Install(wifiPhy, mac, backbone)
-    # 
+
     #  Add the IPv4 protocol stack to the nodes in our container
-    # 
     print ("Enabling OLSR routing on all backbone nodes")
     internet = ns.internet.InternetStackHelper()
     olsr = ns.olsr.OlsrHelper()
     internet.SetRoutingHelper(olsr); # has effect on the next Install ()
     internet.Install(backbone);
-    # re-initialize for non-olsr routing.
-    # internet.Reset()
-    # 
+
     #  Assign IPv4 addresses to the device drivers(actually to the associated
     #  IPv4 interfaces) we just created.
-    # 
     ipAddrs = ns.internet.Ipv4AddressHelper()
     ipAddrs.SetBase(ns.network.Ipv4Address("192.168.0.0"), ns.network.Ipv4Mask("255.255.255.0"))
     ipAddrs.Assign(backboneDevices)
 
-    # 
     #  The ad-hoc network nodes need a mobility model so we aggregate one to 
     #  each of the nodes we just finished building.  
-    # 
     mobility = ns.mobility.MobilityHelper()
     mobility.SetPositionAllocator("ns3::GridPositionAllocator",
                                   "MinX", ns.core.DoubleValue(20.0),
@@ -121,48 +96,38 @@ def main(argv):
     #  Construct the LANs                                                    # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
-
     #  Reset the address base-- all of the CSMA networks will be in
     #  the "172.16 address space
     ipAddrs.SetBase(ns.network.Ipv4Address("172.16.0.0"), ns.network.Ipv4Mask("255.255.255.0"))
 
     for i in range(backboneNodes):
-        print ("Configuring local area network for backbone node ", i)
-        # 
         #  Create a container to manage the nodes of the LAN.  We need
         #  two containers here; one with all of the new nodes, and one
         #  with all of the nodes including new and existing nodes
-        # 
         newLanNodes = ns.network.NodeContainer()
         newLanNodes.Create(lanNodes - 1)
-        #  Now, create the container with all nodes on this link
         lan = ns.network.NodeContainer(ns.network.NodeContainer(backbone.Get(i)), newLanNodes)
-        # 
+
         #  Create the CSMA net devices and install them into the nodes in our 
         #  collection.
-        # 
         csma = ns.csma.CsmaHelper()
-        csma.SetChannelAttribute("DataRate", ns.network.DataRateValue(ns.network.DataRate(5000000)))
-        csma.SetChannelAttribute("Delay", ns.core.TimeValue(ns.core.MilliSeconds(2)))
+        csma.SetChannelAttribute("DataRate", ns.network.DataRateValue(ns.network.DataRate({{datarate}})))
+        csma.SetChannelAttribute("Delay", ns.core.TimeValue(ns.core.MilliSeconds({{delay}})))
         lanDevices = csma.Install(lan)
-        # 
+
         #  Add the IPv4 protocol stack to the new LAN nodes
-        # 
         internet.Install(newLanNodes)
-        # 
+
         #  Assign IPv4 addresses to the device drivers(actually to the 
         #  associated IPv4 interfaces) we just created.
-        # 
         ipAddrs.Assign(lanDevices)
-        # 
+
         #  Assign a new network prefix for the next LAN, according to the
         #  network mask initialized above
-        # 
         ipAddrs.NewNetwork()
-        #
+
         # The new LAN nodes need a mobility model so we aggregate one
         # to each of the nodes we just finished building.
-        #
         mobilityLan = ns.mobility.MobilityHelper() 
         positionAlloc = ns.mobility.ListPositionAllocator()
         for j in range(newLanNodes.GetN()):
@@ -178,25 +143,19 @@ def main(argv):
     #  Construct the mobile networks                                         # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
-
     #  Reset the address base-- all of the 802.11 networks will be in
     #  the "10.0" address space
     ipAddrs.SetBase(ns.network.Ipv4Address("10.0.0.0"), ns.network.Ipv4Mask("255.255.255.0"))
 
     for i in range(backboneNodes):
-        print ("Configuring wireless network for backbone node ", i)
-        # 
         #  Create a container to manage the nodes of the LAN.  We need
         #  two containers here; one with all of the new nodes, and one
         #  with all of the nodes including new and existing nodes
-        # 
         stas = ns.network.NodeContainer()
         stas.Create(infraNodes - 1)
-        #  Now, create the container with all nodes on this link
         infra = ns.network.NodeContainer(ns.network.NodeContainer(backbone.Get(i)), stas)
-        # 
+
         #  Create another ad hoc network and devices
-        # 
         ssid = ns.wifi.Ssid('wifi-infra' + str(i))
         wifiInfra = ns.wifi.WifiHelper()
         wifiPhy.SetChannel(wifiChannel.Create())
@@ -216,22 +175,18 @@ def main(argv):
         infraDevices = ns.network.NetDeviceContainer(apDevices, staDevices)
 
         #  Add the IPv4 protocol stack to the nodes in our container
-        # 
         internet.Install(stas)
-        # 
+
         #  Assign IPv4 addresses to the device drivers(actually to the associated
         #  IPv4 interfaces) we just created.
-        # 
         ipAddrs.Assign(infraDevices)
-        # 
+
         #  Assign a new network prefix for each mobile network, according to 
         #  the network mask initialized above
-        # 
         ipAddrs.NewNetwork()
-        # 
+
         #  The new wireless nodes need a mobility model so we aggregate one 
         #  to each of the nodes we just finished building.
-        # 
         subnetAlloc = ns.mobility.ListPositionAllocator()
         for j in range(infra.GetN()):
             subnetAlloc.Add(ns.core.Vector(0.0, j, 0.0))
@@ -249,10 +204,8 @@ def main(argv):
     #  Application configuration                                             # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
-
     #  Create the OnOff application to send UDP datagrams of size
     #  210 bytes at a rate of 448 Kb/s, between two nodes
-    print ("Create Applications.")
     port = 9   #  Discard port(RFC 863)
 
     appSource = ns.network.NodeList.GetNode(backboneNodes)
@@ -278,10 +231,8 @@ def main(argv):
     #  Tracing configuration                                                 # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # / 
-
-    print ("Configure Tracing.")
     csma = ns.csma.CsmaHelper()
-    # 
+
     #  Let's set up some ns-2-like ascii traces, using another helper class
     # 
     ascii = ns.network.AsciiTraceHelper();
@@ -296,25 +247,17 @@ def main(argv):
     wifiPhy.EnablePcap("mixed-wireless", backboneDevices)
     wifiPhy.EnablePcap("mixed-wireless", appSink.GetId(), 0)
 
-#   #ifdef ENABLE_FOR_TRACING_EXAMPLE
-#     Config.Connect("/NodeList/*/$MobilityModel/CourseChange",
-#       MakeCallback(&CourseChangeCallback))
-#   #endif
-
 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
     #                                                                        # 
     #  Run simulation                                                        # 
     #                                                                        # 
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
-
-    print ("Run Simulation.")
     ns.core.Simulator.Stop(ns.core.Seconds(stopTime))
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
 
+    framework.stop()
 
 if __name__ == '__main__':
-    import sys
-    main(sys.argv)
-
+    main()

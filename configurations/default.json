@@ -1,1 +1,1 @@
-{"paramValues":{"backbone_nodes":[1,5,10],"infra_nodes":[1,2,4],"lan_nodes":[1,2,4],"exec_time":[10,20,120],"ofdm_rate":[6,54],"datarate":[100000,5000000,10000000],"delay":[1,2,10]},"capabilities":["ns3"],"repetitions":"1","seeds":1}
+{"paramValues":{"backbone_nodes":[5,10],"infra_nodes":[2,4],"lan_nodes":[2,4],"exec_time":[10,20,120],"ofdm_rate":[6,54],"datarate":[100000,5000000,10000000],"delay":[1,2,10]},"capabilities":["ns3"],"repetitions":"1","seeds":1}

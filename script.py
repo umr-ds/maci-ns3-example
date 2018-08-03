@@ -17,6 +17,8 @@ import ns.network
 import ns.olsr
 import ns.wifi
 
+import glob
+
 def main():
     framework.start()
 
@@ -247,9 +249,6 @@ def main():
     wifiPhy.EnablePcap("mixed-wireless", backboneDevices)
     wifiPhy.EnablePcap("mixed-wireless", appSink.GetId(), 0)
 
-    framework.addLogfile("mixed-wireless.tr")
-
-
     # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #  
     #                                                                        # 
     #  Run simulation                                                        # 
@@ -258,6 +257,12 @@ def main():
     ns.core.Simulator.Stop(ns.core.Seconds(stopTime))
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
+    
+    framework.addLogfile("mixed-wireless.tr")
+    
+    path = "*.pcap"
+    for filename in glob.glob(path):
+        framework.addLogfile(filename)
 
     framework.stop()
 

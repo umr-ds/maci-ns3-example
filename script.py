@@ -258,11 +258,11 @@ def main():
     ns.core.Simulator.Run()
     ns.core.Simulator.Destroy()
     
-    framework.addLogfile("mixed-wireless.tr")
+    framework.addBinaryFile("mixed-wireless.tr")
     
     path = "*.pcap"
     for filename in glob.glob(path):
-        framework.addLogfile(filename)
+        framework.addBinaryFile(filename)
 
     framework.stop()
 

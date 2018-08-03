@@ -2,7 +2,7 @@
 ### CFG int infra_nodes "Number of infrastructure nodes"
 ### CFG int lan_nodes "Number of LAN nodes"
 ### CFG int exec_time "Simulation time in seconds"
-### CFG string ofdm_rate "OFDM Data Rate (e.g.OfdmRate54Mbps)"
+### CFG int ofdm_rate "OFDM Data Rate"
 ### CFG int datarate "Datarate for LAN"
 ### CFG int delay "Delay for LAN"
 
@@ -55,7 +55,7 @@ def main():
     mac.SetType("ns3::AdhocWifiMac")
     wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager",
                                   "DataMode",
-                                  ns.core.StringValue(str({{ofdm_rate}}))
+                                  ns.core.StringValue("OfdmRate%Mbps" % {{ofdm_rate}})
                                   )
     wifiPhy = ns.wifi.YansWifiPhyHelper.Default()
     wifiChannel = ns.wifi.YansWifiChannelHelper.Default()
